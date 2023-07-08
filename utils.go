@@ -16,6 +16,21 @@ func Max(nums []int) int {
 	return result
 }
 
+func WeightedAverage(values, weights []float64) float64 {
+	var sum, totalWeight float64
+	if len(values) != len(weights) {
+		panic("number of values must equal number of weights")
+	}
+	if len(values) == 0 {
+		return 0
+	}
+	for i, val := range values {
+		sum += val * weights[i]
+		totalWeight += weights[i]
+	}
+	return sum / totalWeight
+}
+
 func StringInSlice(str string, list []string) bool {
 	for _, s := range list {
 		if strings.Contains(s, str) {
