@@ -31,9 +31,18 @@ func WeightedAverage(values, weights []float64) float64 {
 	return sum / totalWeight
 }
 
-func StringInSlice(str string, list []string) bool {
+func SubStringInSlice(str string, list []string) bool {
 	for _, s := range list {
 		if strings.Contains(s, str) {
+			return true
+		}
+	}
+	return false
+}
+
+func StringInSlice(str string, list []string) bool {
+	for _, s := range list {
+		if s == str {
 			return true
 		}
 	}
