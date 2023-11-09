@@ -17,8 +17,8 @@ func LoadFile(filename string, s any) error {
 	return err
 }
 
-// SaveFile saves a (pointer to a) struct into a json file
-func SavFile(filename string, s any) error {
+// SaveFile saves a struct to a json file
+func SaveFile(filename string, s any) error {
 	file, err := os.Create(filepath.Clean(filename))
 	if err != nil {
 		return err

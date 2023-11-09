@@ -4,13 +4,14 @@ import (
 	"sync"
 )
 
+// SafeSlice is a thread-safe slice.
 type SafeSlice struct {
 	sync.RWMutex
 	items []interface{}
 }
 
-// NewSafeSlice creates a new SafeSlice.
-func NewSafeSlice() *SafeSlice {
+// NewSlice creates a new SafeSlice.
+func NewSlice() *SafeSlice {
 	return &SafeSlice{
 		items: make([]interface{}, 0),
 	}
@@ -23,16 +24,6 @@ func (s *SafeSlice) Append(item interface{}) {
 	s.items = append(s.items, item)
 }
 
-// Get returns the item at the given index.
-func (s *SafeSlice) Get(index int) (interface{}, bool) {
-	s.RLock()
-	defer s.RUnlock()
-	if index < 0 || index >= len(s.items) {
-		return nil, false
-	}
-	return s.items[index], true
-}
-
 // Remove removes the item at the given index.
 func (s *SafeSlice) Remove(index int) bool {
 	s.Lock()
@@ -42,6 +33,16 @@ func (s *SafeSlice) Remove(index int) bool {
 	}
 	s.items = append(s.items[:index], s.items[index+1:]...)
 	return true
+}
+
+// Get returns the item at the given index.
+func (s *SafeSlice) Get(index int) (interface{}, bool) {
+	s.RLock()
+	defer s.RUnlock()
+	if index < 0 || index >= len(s.items) {
+		return nil, false
+	}
+	return s.items[index], true
 }
 
 // Size returns the number of elements in the slice.
