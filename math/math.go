@@ -1,115 +1,87 @@
 package math
 
-// Max returns the maximum value in a slice of ints.
-func Max(values []int) int {
-	if len(values) == 0 {
-		return 0
+import "slices"
+
+type (
+	// Number is a generic that can be used in math operations.
+	Number interface {
+		~int | ~int8 | ~int16 | ~int32 | ~int64 |
+			~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+			~float32 | ~float64
 	}
-	result := values[0]
-	for _, num := range values {
-		if num > result {
-			result = num
-		}
-	}
-	return result
+
+	ErrEmpty  struct{}
+	ErrWeight struct{}
+	ErrAvg    struct{}
+)
+
+func (e ErrEmpty) Error() string {
+	return "Numbers cannot be empty"
 }
 
-// Min returns the minimum value in a slice of ints.
-func Min(values []int) int {
-	if len(values) == 0 {
-		return 0
-	}
-	result := values[0]
-	for _, num := range values {
-		if num < result {
-			result = num
-		}
-	}
-	return result
+func (e ErrWeight) Error() string {
+	return "length of values must equal length of weights"
 }
 
-// Sum returns the sum of a slice of ints.
-func Sum(values []int) int {
-	var result int
-	for _, num := range values {
+func (e ErrAvg) Error() string {
+	return "total weight cannot be zero"
+}
+
+// Max returns the maximum value of Numbers.
+func Max[T Number](n []T) (T, error) {
+	if len(n) == 0 {
+		return 0, ErrEmpty{}
+	}
+	return slices.Max(n), nil
+}
+
+// Min returns the minimum value of Numbers.
+func Min[T Number](n []T) (T, error) {
+	if len(n) == 0 {
+		return 0, ErrEmpty{}
+	}
+	return slices.Min(n), nil
+}
+
+// Sum returns the sum of Numbers.
+func Sum[T Number](n []T) (T, error) {
+	if len(n) == 0 {
+		return 0, ErrEmpty{}
+	}
+	var result T
+	for _, num := range n {
 		result += num
 	}
-	return result
+	return result, nil
 }
 
-// Average returns the average of a slice of ints.
-func Average(values []int) int {
-	if len(values) == 0 {
-		return 0
+// Average returns the average of Numbers.
+func Average[T Number](n []T) (T, error) {
+	if len(n) == 0 {
+		return 0, ErrEmpty{}
 	}
-	var sum int
-	for _, num := range values {
-		sum += num
+	sum, err := Sum(n)
+	if err != nil {
+		return 0, err
 	}
-	return sum / len(values)
+	return sum / T(len(n)), nil
 }
 
-// MaxFloat returns the maximum value in a slice of floats.
-func MaxFloat(values []float64) float64 {
-	if len(values) == 0 {
-		return 0
+// WeightedAverage returns the weighted average of Numbers.
+func WeightedAverage[T Number](n, weights []T) (T, error) {
+	if len(n) == 0 {
+		return 0, ErrEmpty{}
 	}
-	result := values[0]
-	for _, num := range values {
-		if num > result {
-			result = num
-		}
+	if len(n) != len(weights) {
+		return 0, ErrAvg{}
 	}
-	return result
-}
-
-// MinFloat returns the minimum value in a slice of floats.
-func MinFloat(values []float64) float64 {
-	if len(values) == 0 {
-		return 0
-	}
-	result := values[0]
-	for _, num := range values {
-		if num < result {
-			result = num
-		}
-	}
-	return result
-}
-
-// SumFloat returns the sum of a slice of floats.
-func SumFloat(values []float64) float64 {
-	var result float64
-	for _, num := range values {
-		result += num
-	}
-	return result
-}
-
-// AverageFloat returns the average of a slice of floats.
-func AverageFloat(values []float64) float64 {
-	if len(values) == 0 {
-		return 0
-	}
-	var sum float64
-	for _, num := range values {
-		sum += num
-	}
-	return sum / float64(len(values))
-}
-
-// WeightedAverage returns the weighted average of a slice of floats.
-func WeightedAverage(values, weights []float64) float64 {
-	var sum, totalWeight float64
-	if len(values) != len(weights) {
-		panic("number of values must equal number of weights")
-	}
-	if len(values) == 0 {
-		return 0
-	}
-	for i, val := range values {
+	var sum, totalWeight T
+	for i, val := range n {
 		sum += val * weights[i]
 		totalWeight += weights[i]
 	}
-	return sum / totalWeight
+	if totalWeight == 0 {
+		return 0, ErrAvg{}
+	}
+	return sum / totalWeight, nil
 }

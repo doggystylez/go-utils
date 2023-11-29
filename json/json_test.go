@@ -20,8 +20,7 @@ func TestLoadFile(t *testing.T) {
 	}
 	json.NewEncoder(tempFile).Encode(ts)
 	tempFile.Close()
-	var result testStruct
-	err := LoadFile(tempFile.Name(), &result)
+	result, err := LoadFile[testStruct](tempFile.Name())
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
