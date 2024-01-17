@@ -174,7 +174,8 @@ func (l *Logger) log(level Level, label string, msg ...any) {
 
 // Shutdown waits for the log queue to be processed and ceases logging.
 func (l *Logger) Shutdown() {
+	l.done <- struct{}{}
 	close(l.done)
-	l.wg.Wait()
 	close(l.logChan)
+	l.wg.Wait()
 }
