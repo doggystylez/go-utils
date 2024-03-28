@@ -50,15 +50,16 @@ func ExclusiveCombine(slice1 []string, slice2 []string) []string {
 }
 
 // Exclude returns a new slice that contains all the elements of the first slice except those that appear in the second slice.
-func Exclude(slice []string, remove []string) (out []string) {
-	toRemove := make(map[string]bool)
+func Exclude(slice []string, remove []string) []string {
+	toRemove := make(map[string]struct{})
 	for _, str := range remove {
-		toRemove[str] = true
+		toRemove[str] = struct{}{}
 	}
+	out := make([]string, 0, len(slice))
 	for _, str := range slice {
-		if !toRemove[str] {
+		if _, found := toRemove[str]; !found {
 			out = append(out, str)
 		}
 	}
-	return
+	return out
 }
